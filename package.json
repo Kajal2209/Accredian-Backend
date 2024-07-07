@@ -1,0 +1,21 @@
+{
+  "name": "accredian-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "googleapis": "^140.0.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.10.2",
+    "nodemailer": "^6.9.14"
+  }
+}

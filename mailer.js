@@ -4,8 +4,12 @@ const OAuth2 = google.auth.OAuth2;
 const path = require('path');
 const fs = require('fs');
 
-const credentialsPath = path.join(__dirname, '/etc/secrets/credentials.json');
-const credentials = JSON.parse(fs.readFileSync(credentialsPath));
+// const credentialsPath = path.join(__dirname, '/etc/secrets/credentials.json');
+// const credentials = JSON.parse(fs.readFileSync(credentialsPath));
+
+const credentialsPath = path.join(__dirname, 'etc', 'secrets', 'credentials.json');
+console.log('Using credentials file path:', credentialsPath);  // Debugging line
+const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
 const { client_id, client_secret, redirect_uris } = credentials.installed;
 const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);

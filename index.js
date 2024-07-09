@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2/promise'); // Using mysql2/promise for async/await support
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 const sendEmail = require('./mailer');
 
 const app = express();
-const PORT = process.env.PORT || 8000; // Use environment variable for port
+const PORT = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
@@ -13,17 +13,37 @@ app.use(express.json());
 const initializeDbConnection = async () => {
   try {
     console.log('Connecting to database...');
+
+    // Connect to MySQL server (not a specific database)
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: process.env.DB_PORT,
     });
-    console.log('Connected to database');
+
+    console.log('Connected to MySQL server');
+
+    // Check if database exists, create it if it doesn't
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\``);
+    console.log(`Database '${process.env.DB_NAME}' is ready`);
+
+    // Connect to the specific database
+    await connection.changeUser({ database: process.env.DB_NAME });
+
+    // Check if table exists, create it if it doesn't
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS refer (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        referral_code VARCHAR(50) NOT NULL
+      )`;
+    await connection.query(createTableQuery);
+    console.log('Table \'refer\' is ready');
+
     return connection;
   } catch (err) {
-    console.error('Failed to connect to the database:', err);
+    console.error('Failed to connect to the database or create required structures:', err);
     process.exit(1); // Exit the process if there is a connection error
   }
 };
@@ -61,7 +81,7 @@ initializeDbConnection().then(db => {
     }
   });
 
-  app.listen(PORT, () => console.log(`Server started at PORT: ${PORT}`));
+  app.listen(PORT, () => console.log(`Server started on port: ${PORT}`));
 }).catch(err => {
   console.error('Error initializing database connection:', err);
 });
